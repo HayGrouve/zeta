@@ -1,6 +1,7 @@
 'use client'
 
-import { useForm } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
+import { useEffect } from 'react'
 
 import type { FormSchema } from '@/types/form-schema'
 
@@ -11,17 +12,26 @@ import { GroupRenderer } from './GroupRenderer'
 
 export function DynamicFormRenderer({
   schema,
+  defaultValues,
   onSubmit,
+  onValueChange,
 }: {
   schema: FormSchema
+  defaultValues?: Record<string, unknown>
   onSubmit?: (values: Record<string, unknown>) => void
+  onValueChange?: (values: Record<string, unknown>) => void
 }) {
   const form = useForm<Record<string, unknown>>({
-    defaultValues: buildDefaultValues(schema),
+    defaultValues: defaultValues ?? buildDefaultValues(schema),
     onSubmit: ({ value }) => {
       onSubmit?.(value)
     },
   })
+
+  const values = useStore(form.store, (s) => s.values)
+  useEffect(() => {
+    onValueChange?.(values)
+  }, [onValueChange, values])
 
   return (
     <div className="space-y-6">

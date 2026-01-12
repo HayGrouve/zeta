@@ -103,19 +103,20 @@ export const formSchemaValidator = z
 
 export type FormSchemaParseResult =
   | { ok: true; schema: z.infer<typeof formSchemaValidator> }
-  | { ok: false; error: string }
+  | { ok: false; errorType: 'invalid_json' | 'invalid_schema'; error: string }
 
 export function parseFormSchema(jsonText: string): FormSchemaParseResult {
   try {
     const parsed = JSON.parse(jsonText) as unknown
     const result = formSchemaValidator.safeParse(parsed)
     if (!result.success) {
-      return { ok: false, error: result.error.message }
+      return { ok: false, errorType: 'invalid_schema', error: result.error.message }
     }
     return { ok: true, schema: result.data }
   } catch (err) {
     return {
       ok: false,
+      errorType: 'invalid_json',
       error: err instanceof Error ? err.message : 'Invalid JSON',
     }
   }
