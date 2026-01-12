@@ -80,6 +80,7 @@ function FormBuilderPage() {
     null,
   )
   const [formResetSeed, setFormResetSeed] = useState(0)
+  const [ignoreSavedValues, setIgnoreSavedValues] = useState(false)
 
   const [debouncedSchemaText, setDebouncedSchemaText] = useState(schemaText)
   useEffect(() => {
@@ -109,6 +110,7 @@ function FormBuilderPage() {
     if (!restoreState.restored) return
     if (restoreState.schemaText) setSchemaText(restoreState.schemaText)
     if (restoreState.values) setLiveValues(restoreState.values)
+    setIgnoreSavedValues(false)
     // Ensure renderer remounts after restore so defaults apply from restored values later.
     setFormResetSeed((s) => s + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -117,9 +119,9 @@ function FormBuilderPage() {
   const effectiveDefaultValues = useMemo(() => {
     if (!schemaResult.ok) return undefined
     const base = buildDefaultValues(schemaResult.schema as unknown as FormSchema)
-    if (!restoredValues) return base
+    if (!restoredValues || ignoreSavedValues) return base
     return deepMerge(base, restoredValues)
-  }, [schemaResult, restoredValues])
+  }, [schemaResult, restoredValues, ignoreSavedValues])
 
   return (
     <div
@@ -141,28 +143,50 @@ function FormBuilderPage() {
         {hasSavedSession ? (
           <div className="rounded-md border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-100 flex items-center justify-between gap-3">
             <div>
-              Restored previous session{restoreState.restoredAt
+              {ignoreSavedValues
+                ? 'Saved session available'
+                : 'Restored previous session'}
+              {restoreState.restoredAt
                 ? ` (saved ${new Date(restoreState.restoredAt).toLocaleString()})`
                 : ''}
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  // Reset current form values but keep schema text
-                  setFormResetSeed((s) => s + 1)
-                  setLiveValues({})
-                  setLastSubmitted(null)
-                }}
-              >
-                Reset current form
-              </Button>
+              {ignoreSavedValues ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    // Apply saved values into the current form instance
+                    setIgnoreSavedValues(false)
+                    if (restoredValues) setLiveValues(restoredValues)
+                    setLastSubmitted(null)
+                    setFormResetSeed((s) => s + 1)
+                  }}
+                >
+                  Apply saved values
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    // Reset current form values but keep schema text.
+                    // Important: do NOT clear the saved session; just stop using it.
+                    setIgnoreSavedValues(true)
+                    setLiveValues({})
+                    setLastSubmitted(null)
+                    setFormResetSeed((s) => s + 1)
+                  }}
+                >
+                  Reset current form
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="destructive"
                 onClick={() => {
                   clear()
+                  setIgnoreSavedValues(true)
                   setFormResetSeed((s) => s + 1)
                   setSchemaText(JSON.stringify(DEFAULT_SCHEMA, null, 2))
                   setLiveValues({})
