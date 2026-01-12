@@ -3,8 +3,10 @@ import { useEffect, useMemo, useState } from 'react'
 
 import { DynamicFormRenderer } from '@/components/form-builder/DynamicFormRenderer'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { useAutoSave } from '@/hooks/useAutoSave'
 import type { FormSchema } from '@/types/form-schema'
 import { parseFormSchema } from '@/types/form-schema.validators'
 
@@ -75,6 +77,7 @@ function FormBuilderPage() {
   const [lastSubmitted, setLastSubmitted] = useState<Record<string, unknown> | null>(
     null,
   )
+  const [formResetSeed, setFormResetSeed] = useState(0)
 
   const [debouncedSchemaText, setDebouncedSchemaText] = useState(schemaText)
   useEffect(() => {
@@ -88,8 +91,24 @@ function FormBuilderPage() {
 
   const schemaKey = useMemo(() => {
     // forces a remount when schema changes so defaultValues re-apply
-    return `schema:${debouncedSchemaText.length}:${debouncedSchemaText.slice(0, 32)}`
-  }, [debouncedSchemaText])
+    return `schema:${formResetSeed}:${debouncedSchemaText.length}:${debouncedSchemaText.slice(0, 32)}`
+  }, [debouncedSchemaText, formResetSeed])
+
+  const { restoreState, hasSavedSession, clear } = useAutoSave({
+    schemaText,
+    values: liveValues,
+    enabled: true,
+    debounceMs: 500,
+  })
+
+  useEffect(() => {
+    if (!restoreState.restored) return
+    if (restoreState.schemaText) setSchemaText(restoreState.schemaText)
+    if (restoreState.values) setLiveValues(restoreState.values)
+    // Ensure renderer remounts after restore so defaults apply from restored values later.
+    setFormResetSeed((s) => s + 1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoreState.restored])
 
   return (
     <div
@@ -107,6 +126,43 @@ function FormBuilderPage() {
             Paste/edit a JSON schema to generate the form. Validation runs 1s after you stop typing.
           </p>
         </div>
+
+        {hasSavedSession ? (
+          <div className="rounded-md border border-cyan-500/30 bg-cyan-500/10 p-3 text-sm text-cyan-100 flex items-center justify-between gap-3">
+            <div>
+              Restored previous session{restoreState.restoredAt
+                ? ` (saved ${new Date(restoreState.restoredAt).toLocaleString()})`
+                : ''}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  // Reset current form values but keep schema text
+                  setFormResetSeed((s) => s + 1)
+                  setLiveValues({})
+                  setLastSubmitted(null)
+                }}
+              >
+                Reset current form
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={() => {
+                  clear()
+                  setFormResetSeed((s) => s + 1)
+                  setSchemaText(JSON.stringify(DEFAULT_SCHEMA, null, 2))
+                  setLiveValues({})
+                  setLastSubmitted(null)
+                }}
+              >
+                Clear saved session
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <Card>
