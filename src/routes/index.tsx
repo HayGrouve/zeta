@@ -2,11 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
 
 import { DynamicFormRenderer } from '@/components/form-builder/DynamicFormRenderer'
+import { buildDefaultValues } from '@/components/form-builder/defaults'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAutoSave } from '@/hooks/useAutoSave'
+import { deepMerge } from '@/lib/deepMerge'
 import type { FormSchema } from '@/types/form-schema'
 import { parseFormSchema } from '@/types/form-schema.validators'
 
@@ -101,6 +103,8 @@ function FormBuilderPage() {
     debounceMs: 500,
   })
 
+  const restoredValues = restoreState.values ?? null
+
   useEffect(() => {
     if (!restoreState.restored) return
     if (restoreState.schemaText) setSchemaText(restoreState.schemaText)
@@ -109,6 +113,13 @@ function FormBuilderPage() {
     setFormResetSeed((s) => s + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restoreState.restored])
+
+  const effectiveDefaultValues = useMemo(() => {
+    if (!schemaResult.ok) return undefined
+    const base = buildDefaultValues(schemaResult.schema as unknown as FormSchema)
+    if (!restoredValues) return base
+    return deepMerge(base, restoredValues)
+  }, [schemaResult, restoredValues])
 
   return (
     <div
@@ -209,6 +220,7 @@ function FormBuilderPage() {
                 <DynamicFormRenderer
                   key={schemaKey}
                   schema={schemaResult.schema as unknown as FormSchema}
+                  defaultValues={effectiveDefaultValues}
                   onSubmit={(values) => {
                     setLastSubmitted(values)
                   }}

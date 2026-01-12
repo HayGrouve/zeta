@@ -46,9 +46,19 @@ export function useAutoSave({
   enabled?: boolean
   debounceMs?: number
 }) {
-  const [restoreState, setRestoreState] = useState<AutoSaveState>({
-    restored: false,
+  const [restoreState, setRestoreState] = useState<AutoSaveState>(() => {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return { restored: false }
+    const payload = safeParsePayload(raw)
+    if (!payload) return { restored: false }
+    return {
+      restored: true,
+      restoredAt: payload.savedAt,
+      schemaText: payload.schemaText,
+      values: payload.values,
+    }
   })
+  const [isHydrated, setIsHydrated] = useState(false)
 
   const latest = useRef({ schemaText, values, enabled, debounceMs })
   useEffect(() => {
@@ -56,20 +66,12 @@ export function useAutoSave({
   }, [schemaText, values, enabled, debounceMs])
 
   useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return
-    const payload = safeParsePayload(raw)
-    if (!payload) return
-    setRestoreState({
-      restored: true,
-      restoredAt: payload.savedAt,
-      schemaText: payload.schemaText,
-      values: payload.values,
-    })
+    setIsHydrated(true)
   }, [])
 
   useEffect(() => {
     if (!enabled) return
+    if (!isHydrated) return
 
     const handle = setTimeout(() => {
       const { schemaText: st, values: v } = latest.current
@@ -83,7 +85,7 @@ export function useAutoSave({
     }, debounceMs)
 
     return () => clearTimeout(handle)
-  }, [schemaText, values, enabled, debounceMs])
+  }, [schemaText, values, enabled, debounceMs, isHydrated])
 
   const clear = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
@@ -98,6 +100,7 @@ export function useAutoSave({
     restoreState,
     hasSavedSession,
     clear,
+    isHydrated,
   }
 }
 
