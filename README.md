@@ -49,6 +49,8 @@ Schema types + validators:
 - `src/types/form-schema.ts`
 - `src/types/form-schema.validators.ts` (lenient Zod validation)
 
+More details: `docs/form-schema.md`
+
 Key conventions:
 - **Field IDs** can be **dot-paths** (e.g. `address.zip`) and will produce nested output JSON.
 - Supported `type` values: `text | textarea | dropdown | checkbox | radio`
