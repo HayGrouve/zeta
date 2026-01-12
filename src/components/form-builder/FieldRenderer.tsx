@@ -1,7 +1,5 @@
 'use client'
 
-import { useStore } from '@tanstack/react-form'
-
 import type { FormField } from '@/types/form-schema'
 
 import { Checkbox } from '@/components/ui/checkbox'
@@ -56,10 +54,12 @@ export function FieldRenderer({
   return (
     <form.Field name={field.id as never}>
       {(fieldApi: any) => {
-        const errors = useStore(fieldApi.store, (s: any) => s.meta.errors) as Array<
+        // IMPORTANT: Do not use hooks in this render callback (React rules of hooks).
+        // `fieldApi.state` updates re-render this callback, so reading directly is enough.
+        const errors = (fieldApi.state.meta.errors ?? []) as Array<
           string | { message: string }
         >
-        const isTouched = useStore(fieldApi.store, (s: any) => s.meta.isTouched) as boolean
+        const isTouched = Boolean(fieldApi.state.meta.isTouched)
         const id = toDomId(field.id)
 
         const label = (
