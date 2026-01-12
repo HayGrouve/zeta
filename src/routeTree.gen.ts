@@ -13,7 +13,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
-import { Route as DemoFormBuilderSmokeRouteImport } from './routes/demo/form/builder-smoke'
 import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
@@ -39,11 +38,6 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
 const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
   id: '/demo/form/simple',
   path: '/demo/form/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormBuilderSmokeRoute = DemoFormBuilderSmokeRouteImport.update({
-  id: '/demo/form/builder-smoke',
-  path: '/demo/form/builder-smoke',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
@@ -81,7 +75,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/builder-smoke': typeof DemoFormBuilderSmokeRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -94,7 +87,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/builder-smoke': typeof DemoFormBuilderSmokeRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -108,7 +100,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/builder-smoke': typeof DemoFormBuilderSmokeRoute
   '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
@@ -123,7 +114,6 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/api/names'
     | '/demo/form/address'
-    | '/demo/form/builder-smoke'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -136,7 +126,6 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/api/names'
     | '/demo/form/address'
-    | '/demo/form/builder-smoke'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -149,7 +138,6 @@ export interface FileRouteTypes {
     | '/'
     | '/demo/api/names'
     | '/demo/form/address'
-    | '/demo/form/builder-smoke'
     | '/demo/form/simple'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
@@ -163,7 +151,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoFormAddressRoute: typeof DemoFormAddressRoute
-  DemoFormBuilderSmokeRoute: typeof DemoFormBuilderSmokeRoute
   DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
@@ -201,13 +188,6 @@ declare module '@tanstack/react-router' {
       path: '/demo/form/simple'
       fullPath: '/demo/form/simple'
       preLoaderRoute: typeof DemoFormSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/builder-smoke': {
-      id: '/demo/form/builder-smoke'
-      path: '/demo/form/builder-smoke'
-      fullPath: '/demo/form/builder-smoke'
-      preLoaderRoute: typeof DemoFormBuilderSmokeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/form/address': {
@@ -259,7 +239,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoFormAddressRoute: DemoFormAddressRoute,
-  DemoFormBuilderSmokeRoute: DemoFormBuilderSmokeRoute,
   DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
