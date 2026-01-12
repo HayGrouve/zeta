@@ -79,7 +79,7 @@ const DEFAULT_SCHEMA: FormSchema = {
   ],
 }
 
-function FormBuilderPage() {
+export function FormBuilderPage() {
   const [schemaText, setSchemaText] = useState(() =>
     JSON.stringify(DEFAULT_SCHEMA, null, 2),
   )

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 import type { RenderOptions } from '@testing-library/react'
 import { afterEach, vi } from 'vitest'
 
@@ -9,9 +9,10 @@ export function renderUi(ui: React.ReactElement, options?: RenderOptions) {
 }
 
 export async function advance(ms: number) {
-  vi.advanceTimersByTime(ms)
+  await act(async () => {
+    vi.advanceTimersByTime(ms)
+  })
   // Flush microtasks (state updates, promises)
-  await Promise.resolve()
   await Promise.resolve()
 }
 
