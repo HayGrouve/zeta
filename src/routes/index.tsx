@@ -6,9 +6,17 @@ import { buildDefaultValues } from '@/components/form-builder/defaults'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { deepMerge } from '@/lib/deepMerge'
+import { EXAMPLE_SCHEMAS } from '@/data/example-schemas'
 import type { FormSchema } from '@/types/form-schema'
 import { parseFormSchema } from '@/types/form-schema.validators'
 
@@ -75,6 +83,7 @@ function FormBuilderPage() {
   const [schemaText, setSchemaText] = useState(() =>
     JSON.stringify(DEFAULT_SCHEMA, null, 2),
   )
+  const [selectedExampleId, setSelectedExampleId] = useState<string>('custom')
   const [liveValues, setLiveValues] = useState<Record<string, unknown>>({})
   const [lastSubmitted, setLastSubmitted] = useState<Record<string, unknown> | null>(
     null,
@@ -106,11 +115,16 @@ function FormBuilderPage() {
 
   const restoredValues = restoreState.values ?? null
 
+  const selectedExample = useMemo(() => {
+    return EXAMPLE_SCHEMAS.find((e) => e.id === selectedExampleId) ?? null
+  }, [selectedExampleId])
+
   useEffect(() => {
     if (!restoreState.restored) return
     if (restoreState.schemaText) setSchemaText(restoreState.schemaText)
     if (restoreState.values) setLiveValues(restoreState.values)
     setIgnoreSavedValues(false)
+    setSelectedExampleId('custom')
     // Ensure renderer remounts after restore so defaults apply from restored values later.
     setFormResetSeed((s) => s + 1)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -205,6 +219,45 @@ function FormBuilderPage() {
               <CardTitle>Schema (JSON)</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 space-y-3">
+              <div className="space-y-2">
+                <Label>Load Example</Label>
+                <Select
+                  value={selectedExampleId}
+                  onValueChange={(value) => {
+                    setSelectedExampleId(value)
+                    if (value === 'custom') return
+
+                    const selected = EXAMPLE_SCHEMAS.find((e) => e.id === value)
+                    if (!selected) return
+
+                    setSchemaText(selected.jsonText)
+                    setIgnoreSavedValues(true)
+                    setLiveValues({})
+                    setLastSubmitted(null)
+                    setFormResetSeed((s) => s + 1)
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choose an example" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="custom">Custom</SelectItem>
+                    {EXAMPLE_SCHEMAS.map((ex) => (
+                      <SelectItem key={ex.id} value={ex.id}>
+                        {ex.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedExample ? (
+                  <div className="text-xs text-slate-300">{selectedExample.description}</div>
+                ) : (
+                  <div className="text-xs text-slate-400">
+                    Pick an example to populate the editor, or keep editing custom JSON.
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="schemaText">JSON Schema</Label>
                 <Textarea
