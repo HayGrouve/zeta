@@ -9,16 +9,25 @@ import path from 'node:path'
 
 const isTest = process.env.VITEST === 'true'
 
+const testReactAliases = isTest
+  ? {
+      // On pnpm (especially on Windows), React can be resolved via multiple physical paths.
+      // Aliasing forces a single instance for tests.
+      react: path.resolve(process.cwd(), 'node_modules/react'),
+      'react-dom': path.resolve(process.cwd(), 'node_modules/react-dom'),
+    }
+  : {}
+
 const config = defineConfig({
   resolve: {
     // Prevent duplicate React instances during dev/test builds (fixes "Invalid hook call").
     dedupe: ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
-    // On pnpm (especially on Windows), React can be resolved via multiple physical paths.
-    // Aliasing forces a single instance for tests.
-    alias: {
-      react: path.resolve(process.cwd(), 'node_modules/react'),
-      'react-dom': path.resolve(process.cwd(), 'node_modules/react-dom'),
-    },
+    // IMPORTANT:
+    // Keep React aliasing scoped to Vitest only.
+    // In dev/SSR, forcing React resolution via a filesystem alias can bypass Vite's CJS handling for
+    // `react/jsx-runtime` (which is CommonJS and uses `module.exports`), leading to:
+    // "ReferenceError: module is not defined".
+    alias: testReactAliases,
     preserveSymlinks: false,
   },
   test: {
