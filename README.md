@@ -7,7 +7,9 @@ The main page (`/`) lets you:
 - Generate a form with nested groups and multiple field types
 - See **live output** and **last submit output**
 - Use **auto-save** (schema + values) via `localStorage`
-- Load example schemas (Registration / KYC / Loan)
+- Load example schemas (Registration / KYC / Loan / Showcase)
+- Fetch mocked external data via an explicit **Fetch Data** button (when `apiIntegrations` exist)
+- Inspect a field/group in the preview and highlight its JSON config in the editor (magnifier icon)
 
 ## Getting started
 
@@ -39,9 +41,14 @@ pnpm format
   - **Last Submitted** (captures values on submit)
 - **Auto-save**:
   - Saves `{ schemaText, values }` to `localStorage` under key `zeta.formBuilder.v1` (debounced 500ms)
-  - Shows a restore banner when a saved session is found
-  - Includes actions for “Reset current form” and “Clear saved session”
-- **Example schemas**: use “Load Example” (Custom / Registration / KYC / Loan)
+  - Shows a **Restore** banner when a saved session is found (does not auto-restore)
+  - **Restore** loads the previous schema + values
+  - **Dismiss** hides the banner for the current visit
+  - **Clear saved** deletes the saved session from `localStorage`
+- **Example schemas**: use “Preset Library” (Custom / Registration / KYC / Loan / Showcase)
+- **Submit behavior**:
+  - Required field errors appear on first submit attempt
+  - If submit fails due to visible errors, the page scrolls to the top
 
 ## Schema overview
 
@@ -53,7 +60,7 @@ More details: `docs/form-schema.md`
 
 Key conventions:
 - **Field IDs** can be **dot-paths** (e.g. `address.zip`) and will produce nested output JSON.
-- Supported `type` values: `text | textarea | dropdown | checkbox | radio`
+- Supported `type` values: `text | textarea | dropdown | checkbox | radio | number`
 
 Minimal schema example:
 
@@ -87,8 +94,11 @@ Examples live in `src/data/example-schemas.ts`:
 - **Registration (Visibility)**: includes `visibility` metadata for conditional sections
 - **KYC (Dynamic Validation)**: includes `validation` metadata tied to another field
 - **Loan (API Auto-Fill + Nested)**: includes `apiIntegrations` metadata and nested groups
+- **Showcase (All Features)**: demonstrates all field types, nested groups, API integrations, and visibility rules
 
-Note: some advanced behaviors (visibility/conditional validation/API autofill) are represented in the schema and planned, but runtime behavior may be incremental depending on the current implementation step.
+Mock API demo inputs:
+- ZIP: try `10001`, `94105`, `60601`
+- Company registration: try `REG-0001` or `REG-0002` (unknown values like `REG-0003` show an error)
 
 ## Tests
 
