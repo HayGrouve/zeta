@@ -1,8 +1,9 @@
-# Dynamic Form Builder (Zeta Assignment)
+# Dynamic Form Builder (Zetta Assignment)
 
 A JSON-driven dynamic form builder built with **TanStack Start** + **TanStack React Form**, styled using **Tailwind v4** + **shadcn/ui**.
 
 The main page (`/`) lets you:
+
 - Paste/edit a JSON schema in a textarea
 - Generate a form with nested groups and multiple field types
 - See **live output** and **last submit output**
@@ -53,12 +54,14 @@ pnpm format
 ## Schema overview
 
 Schema types + validators:
+
 - `src/types/form-schema.ts`
 - `src/types/form-schema.validators.ts` (lenient Zod validation)
 
 More details: `docs/form-schema.md`
 
 Key conventions:
+
 - **Field IDs** can be **dot-paths** (e.g. `address.zip`) and will produce nested output JSON.
 - Supported `type` values: `text | textarea | dropdown | checkbox | radio | number`
 
@@ -91,18 +94,21 @@ Minimal schema example:
 ## Example schemas
 
 Examples live in `src/data/example-schemas.ts`:
+
 - **Registration (Visibility)**: includes `visibility` metadata for conditional sections
 - **KYC (Dynamic Validation)**: includes `validation` metadata tied to another field
 - **Loan (API Auto-Fill + Nested)**: includes `apiIntegrations` metadata and nested groups
 - **Showcase (All Features)**: demonstrates all field types, nested groups, API integrations, and visibility rules
 
 Mock API demo inputs:
+
 - ZIP: try `10001`, `94105`, `60601`
 - Company registration: try `REG-0001` or `REG-0002` (unknown values like `REG-0003` show an error)
 
 ## Tests
 
 Unit tests are in `src/__tests__/`:
+
 - `form-rendering.test.tsx`
 - `page-flow.test.tsx`
 - `form-submission.test.tsx`
@@ -121,4 +127,3 @@ Add new components using the latest shadcn CLI:
 ```bash
 pnpm dlx shadcn@latest add button
 ```
-
