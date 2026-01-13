@@ -34,6 +34,7 @@ Groups can contain `fields` and/or nested `groups`. Groups can also include cond
 Supported field types:
 - `text`
 - `textarea`
+- `number`
 - `dropdown`
 - `checkbox`
 - `radio`
@@ -43,10 +44,10 @@ Field IDs can be **dot-paths** (e.g. `address.zip`) to produce nested output JSO
 ```json
 {
   "id": "string",
-  "type": "text | textarea | dropdown | checkbox | radio",
+  "type": "text | textarea | number | dropdown | checkbox | radio",
   "label": "string",
   "placeholder": "string (optional)",
-  "defaultValue": "string|boolean (optional)",
+  "defaultValue": "string|number|boolean (optional)",
   "options": "Array<{label,value}> (required for dropdown/radio)",
   "disabled": "boolean (optional)",
   "visibility": "VisibilityCondition (optional)",
@@ -81,6 +82,10 @@ Field IDs can be **dot-paths** (e.g. `address.zip`) to produce nested output JSO
   }
 }
 ```
+
+Notes:
+- `min/max` apply to `number` fields (and are ignored for text types unless explicitly handled).
+- `pattern/minLength/maxLength` apply to text-like fields.
 
 ## ApiIntegration (metadata)
 

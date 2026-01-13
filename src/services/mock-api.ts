@@ -62,7 +62,10 @@ function hashToUnitInterval(input: string): number {
   return (hash >>> 0) / 2 ** 32
 }
 
-function getDefaultDelayMs(endpoint: MockApiEndpoint, inputs: MockApiInputs): number {
+function getDefaultDelayMs(
+  endpoint: MockApiEndpoint,
+  inputs: MockApiInputs,
+): number {
   const r = hashToUnitInterval(`${endpoint}:${stableStringify(inputs)}`)
   // 400..800ms inclusive-ish
   return 400 + Math.floor(r * 401)
@@ -84,7 +87,10 @@ function readString(inputs: MockApiInputs, key: string): string | undefined {
   return typeof value === 'string' ? value : undefined
 }
 
-function assertNonEmptyString(value: string | undefined, fieldName: string): string {
+function assertNonEmptyString(
+  value: string | undefined,
+  fieldName: string,
+): string {
   if (!value || value.trim().length === 0) {
     throw new Error(`MOCK_API:INVALID_INPUT:${fieldName}`)
   }
@@ -122,8 +128,8 @@ function fetchCompanyDetails(inputs: MockApiInputs): CompanyDetailsResponse {
 
   const table: Record<string, CompanyDetailsResponse> = {
     'REG-0001': {
-      companyName: 'Zeta Demo Holdings (Pty) Ltd',
-      tradingName: 'Zeta Demo',
+      companyName: 'Zetta Demo Holdings (Pty) Ltd',
+      tradingName: 'Zetta Demo',
       vatNumber: 'ZA1234567890',
     },
     'REG-0002': {
@@ -132,18 +138,27 @@ function fetchCompanyDetails(inputs: MockApiInputs): CompanyDetailsResponse {
     },
   }
 
-  return (
-    table[registrationNumber] ?? {
-      companyName: `Company ${registrationNumber}`,
-    }
-  )
+  const result = table[registrationNumber]
+  if (!result) {
+    throw new Error('MOCK_API:UNKNOWN_REGISTRATION_NUMBER')
+  }
+  return result
 }
 
-function validateIdentification(inputs: MockApiInputs): IdentificationValidationResponse {
+function validateIdentification(
+  inputs: MockApiInputs,
+): IdentificationValidationResponse {
   const idTypeRaw = readString(inputs, 'idType')
-  const idNumber = assertNonEmptyString(readString(inputs, 'idNumber'), 'idNumber')
+  const idNumber = assertNonEmptyString(
+    readString(inputs, 'idNumber'),
+    'idNumber',
+  )
 
-  if (idTypeRaw !== 'PERSONAL_ID' && idTypeRaw !== 'PASSPORT' && idTypeRaw !== 'DRIVER_LICENSE') {
+  if (
+    idTypeRaw !== 'PERSONAL_ID' &&
+    idTypeRaw !== 'PASSPORT' &&
+    idTypeRaw !== 'DRIVER_LICENSE'
+  ) {
     throw new Error('MOCK_API:INVALID_INPUT:idType')
   }
 
@@ -197,4 +212,3 @@ export async function callMockApi(
     }
   }
 }
-

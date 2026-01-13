@@ -53,10 +53,10 @@ export const apiIntegrationSchema = z
 export const formFieldSchema = z
   .object({
     id: nonEmptyString,
-    type: z.enum(['text', 'textarea', 'dropdown', 'checkbox', 'radio']),
+    type: z.enum(['text', 'textarea', 'dropdown', 'checkbox', 'radio', 'number']),
     label: nonEmptyString,
     placeholder: z.string().optional(),
-    defaultValue: z.union([z.string(), z.boolean()]).optional(),
+    defaultValue: z.union([z.string(), z.boolean(), z.number()]).optional(),
     options: z.array(z.object({ label: nonEmptyString, value: nonEmptyString })).optional(),
     validation: z.array(dynamicValidationSchema).optional(),
     visibility: visibilityConditionSchema.optional(),

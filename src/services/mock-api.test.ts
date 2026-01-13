@@ -30,6 +30,27 @@ describe('mock api', () => {
     expect(result.tradingName).toBe('Zeta Demo')
   })
 
+  it('fetchCompanyDetails supports a second demo registration number', async () => {
+    const result = (await callMockApi(
+      'fetchCompanyDetails',
+      { registrationNumber: 'REG-0002' },
+      { delayMs: 0 },
+    )) as { companyName: string; tradingName?: string; vatNumber?: string }
+
+    expect(result.companyName).toBe('Acme Trading (Pty) Ltd')
+    expect(result.tradingName).toBe('Acme')
+  })
+
+  it('fetchCompanyDetails throws for unknown registration number', async () => {
+    await expect(
+      callMockApi(
+        'fetchCompanyDetails',
+        { registrationNumber: 'REG-0003' },
+        { delayMs: 0 },
+      ),
+    ).rejects.toThrow(/MOCK_API:UNKNOWN_REGISTRATION_NUMBER/)
+  })
+
   it('validateIdentification returns isValid=true for valid personal id', async () => {
     const result = (await callMockApi(
       'validateIdentification',
