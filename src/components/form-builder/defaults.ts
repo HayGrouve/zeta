@@ -13,6 +13,8 @@ function getFieldDefaultValue(field: FormField): unknown {
     case 'dropdown':
     case 'radio':
       return ''
+    case 'number':
+      return ''
     default:
       return ''
   }

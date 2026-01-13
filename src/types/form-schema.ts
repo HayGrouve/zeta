@@ -1,4 +1,10 @@
-export type FieldType = 'text' | 'textarea' | 'dropdown' | 'checkbox' | 'radio'
+export type FieldType =
+  | 'text'
+  | 'textarea'
+  | 'dropdown'
+  | 'checkbox'
+  | 'radio'
+  | 'number'
 
 export type ConditionOperator =
   | 'equals'
@@ -77,7 +83,7 @@ export interface FormField {
   /**
    * Default value for rendering; final defaults are generated later.
    */
-  defaultValue?: string | boolean
+  defaultValue?: string | boolean | number
   /**
    * Options for dropdown/radio.
    */
@@ -115,5 +121,5 @@ export interface FormSchema {
  * Output values are schema-driven; we keep this flexible for now.
  * The renderer will later build a nested object from dot-path ids.
  */
-export type FormValues = Record<string, string | boolean | undefined>
+export type FormValues = Record<string, string | boolean | number | undefined>
 
